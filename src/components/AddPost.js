@@ -33,7 +33,8 @@ function AddPost() {
         body: JSON.stringify({ title, description }),
       });
       if (response.ok) {
-        navigate("/");
+        const {message} = await response.json()
+        navigate("/", {state:{message}});
       }
     } catch (error) {
     } finally {

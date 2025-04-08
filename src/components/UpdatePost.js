@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import ToastNotification from "./ToastNotification";
 
 function UpdatePost({ id }) {
   const params = useParams();
@@ -13,6 +14,10 @@ function UpdatePost({ id }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [show,setShow] = useState(false)
+  const [isError,setIsError] = useState(false)
+  const [message, setMessage] = useState("")
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -38,13 +43,21 @@ function UpdatePost({ id }) {
       );
       console.log(response);
       if (response.ok) {
-        navigate("/");
+        setTitle("");
+        setDescription("");
+        setIsError(false)
+        navigate("/",{state:{message:"Post updated Successfully"}});
+      }else {
+        const errResponse = await response.json()
+        throw new Error(errResponse.message)
       }
     } catch (error) {
+      setShow(true)
+      setIsError(true)
+      setMessage(error.message)
     } finally {
       setLoading(false);
-      setTitle("");
-      setDescription("");
+     
     }
   };
   const getSinglePost = async () => {
@@ -68,6 +81,8 @@ function UpdatePost({ id }) {
     getSinglePost();
   }, []);
   return (
+   <>
+     { show &&  <ToastNotification text={message} show={show} setShow={setShow} isError={isError}  />}
     <Container className="mt-5">
       <Row className="mt-3">
         <Col
@@ -124,6 +139,7 @@ function UpdatePost({ id }) {
         </Col>
       </Row>
     </Container>
+   </>
   );
 }
 

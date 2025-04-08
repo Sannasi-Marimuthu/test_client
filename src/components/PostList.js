@@ -6,13 +6,19 @@ import Button from "react-bootstrap/Button";
 import { BsPlusCircleFill } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import { AiOutlineEdit } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "./LoadingSpinner";
+import ToastNotification from "./ToastNotification";
 
 const PostList = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [show,setShow] = useState(false)
+  const [isError,setIsError] = useState(false)
+  const [message, setMessage] = useState("")
 
   const getPosts = async () => {
     try {
@@ -39,20 +45,37 @@ const PostList = () => {
         { method: "DELETE" }
       );
       if (response.ok) {
+        setShow(true)
+        setIsError(false)
+        const {message} = await response.json()
+        setMessage(message)
         await getPosts();
       } else {
         const errResponse = await response.json();
         throw new Error(errResponse.message);
       }
-    } catch (error) {}
+    } catch (error) {
+      setIsError(true)
+      setMessage(error.message)
+      setShow(true)
+    }
   };
 
   useEffect(() => {
     getPosts();
   }, []);
 
+  useEffect(() => {
+    if(location.state && location.state.message){
+      setMessage(location.state.message)
+      setShow(true)
+    }
+    navigate("/", {replace:true})
+  },[location.state])
+
   return (
     <>
+   {show &&  <ToastNotification text={message} show={show} setShow={setShow} isError={isError} />}
       <Container className="mt-5">
         <Button size="lg" variant="success">
           <Link
