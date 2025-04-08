@@ -7,17 +7,33 @@ import { BsPlusCircleFill } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import { AiOutlineEdit } from "react-icons/ai";
 import { Link } from "react-router-dom";
-
-const dataset = [
-  { _id: "11", title: "san", description: "Dummy description" },
-  { _id: "12", title: "sanu", description: "test description" },
-  { _id: "13", title: "sathish", description: "demo description" },
-  { _id: "11", title: "san", description: "Dummy description" },
-  { _id: "12", title: "sanu", description: "test description" },
-  { _id: "13", title: "sathish", description: "demo description" },
-];
+import { useEffect, useState } from "react";
+import LoadingSpinner from "./LoadingSpinner"
 
 const PostList = () => {
+
+  const [posts,setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false)
+
+  const getPosts = async () => {
+     try {
+      setIsLoading(true)
+      const response = await fetch("http://localhost:5500/api/posts");
+      const data = await response.json()
+      setPosts(data)
+      console.log(data)
+     } catch (error) {
+      console.log(error.message)
+     }finally{
+      setIsLoading(false)
+     }
+  }
+
+  useEffect(() => {
+    getPosts()
+  },[])
+
+
   return (
     <>
       <Container className="mt-5">
@@ -27,7 +43,8 @@ const PostList = () => {
           </Link>
         </Button>
         <Row className="mt-3" sm={1} md={3}>
-          {dataset.map((post) => (
+          {isLoading && <LoadingSpinner /> }
+          {!isLoading && posts.map((post) => (
             <Col key={post._id}>
               <Card className="mb-2">
                 <Card.Body>
