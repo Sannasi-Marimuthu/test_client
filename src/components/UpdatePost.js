@@ -4,9 +4,69 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function UpdatePost({ id }) {
+  const params = useParams();
+  const navigate = useNavigate();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    if (!title) {
+      alert("Please enter title");
+      return;
+    }
+    if (!description) {
+      alert("Please enter Description");
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:5500/api/updatepost/${params.postid}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ title, description }),
+        }
+      );
+      console.log(response);
+      if (response.ok) {
+        navigate("/");
+      }
+    } catch (error) {
+    } finally {
+      setLoading(false);
+      setTitle("");
+      setDescription("");
+    }
+  };
+  const getSinglePost = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5500/api/post/${params.postid}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      const { post } = data;
+      setTitle(post.title);
+      setDescription(post.description);
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    getSinglePost();
+  }, []);
   return (
     <Container className="mt-5">
       <Row className="mt-3">
@@ -17,13 +77,15 @@ function UpdatePost({ id }) {
         >
           <h1 className="display-6 text-center mb-3">Update Post</h1>
 
-          <Form onSubmit={() => {}}>
+          <Form onSubmit={submitHandler}>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
               <Form.Control
                 type="title"
-                value=""
-                onChange={(e) => {}}
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                }}
                 placeholder="Enter Title"
               />
             </Form.Group>
@@ -31,19 +93,24 @@ function UpdatePost({ id }) {
               <Form.Label>Description</Form.Label>
               <Form.Control
                 as="textarea"
-                value=""
-                onChange={(e) => {}}
+                value={description}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                }}
                 placeholder="Enter Description"
                 rows={3}
               />
             </Form.Group>
             <Button variant="dark" type="button">
-            <Link to={"/"} className="text-decoration-none text-white" >   Cancel</Link>
+              <Link to={"/"} className="text-decoration-none text-white">
+                {" "}
+                Cancel
+              </Link>
             </Button>
-            <Button variant="warning" type="submit" className="mx-2">
+           {!loading && <Button variant="warning" type="submit" className="mx-2">
               Update
-            </Button>
-            <Button variant="primary" className="mx-2" disabled>
+            </Button>}
+            {loading && <Button variant="primary" className="mx-2" disabled>
               <Spinner
                 as="span"
                 animation="grow"
@@ -52,7 +119,7 @@ function UpdatePost({ id }) {
                 aria-hidden="true"
               />{" "}
               Loading...
-            </Button>
+            </Button>}
           </Form>
         </Col>
       </Row>
