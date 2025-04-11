@@ -32,7 +32,7 @@ function UpdatePost({ id }) {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:5500/api/updatepost/${params.postid}`,
+        `https://post-api-lnr9.onrender.com/api/updatepost/${params.postid}`,
         {
           method: "PUT",
           headers: {
@@ -63,7 +63,7 @@ function UpdatePost({ id }) {
   const getSinglePost = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5500/api/post/${params.postid}`,
+        `https://post-api-lnr9.onrender.com/api/post/${params.postid}`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -23,7 +23,7 @@ const PostList = () => {
   const getPosts = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:5500/api/posts");
+      const response = await fetch("https://post-api-lnr9.onrender.com/api/posts");
       const data = await response.json();
       setPosts(data);
       console.log(data);
@@ -41,7 +41,7 @@ const PostList = () => {
     }
     try {
       const response = await fetch(
-        `http://localhost:5500/api/deletepost/${id}`,
+        `https://post-api-lnr9.onrender.com/api/deletepost/${id}`,
         { method: "DELETE" }
       );
       if (response.ok) {

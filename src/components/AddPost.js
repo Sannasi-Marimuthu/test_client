@@ -25,7 +25,7 @@ function AddPost() {
     }
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5500/api/createpost", {
+      const response = await fetch("https://post-api-lnr9.onrender.com/api/createpost", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
